@@ -6,11 +6,17 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/16 12:46:26 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/16 12:47:27 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/21 18:48:56 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
+
+int	str_error(char	*error)
+{
+	ft_putstr_fd(error, 2);
+	return (-1);
+}
 
 int	ft_atoi(const char *str)
 {
@@ -37,4 +43,29 @@ int	ft_atoi(const char *str)
 			return (0);
 	}
 	return (res * n);
+}
+
+int	ft_strlen(const char *s)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+		i++;
+	return (i);
+}
+
+void	ft_putstr_fd(char *s, int fd)
+{
+	int		i;
+
+	i = 0;
+	if (s)
+	{
+		while (s[i])
+		{
+			write(fd, &s[i], 1);
+			i++;
+		}
+	}
 }
