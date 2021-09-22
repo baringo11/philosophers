@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/20 11:58:30 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/21 18:44:36 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/22 14:39:47 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,15 @@ typedef struct	s_philo
 typedef struct	s_all
 {
 	int			num_philos;
+	int			index;
 	int			time_die;
 	int			time_eat;
 	int			time_sleep;
 	int			num_iterations[2];
 	pthread_t	*threads;
 	pthread_mutex_t *forks;
+	time_t start_sec;
+	suseconds_t start_usec;
 	t_philo		*philo;
 
 }				t_all;

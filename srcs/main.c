@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/16 11:32:31 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/21 20:20:07 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/22 14:39:56 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 int	check_arguments(char **argv, t_all *all)
 {
 	all->num_philos = ft_atoi(argv[1]);
-	all->time_die = ft_atoi(argv[2]);
-	all->time_eat = ft_atoi(argv[3]);
-	all->time_sleep = ft_atoi(argv[4]);
+	all->time_die = ft_atoi(argv[2]) * 1000;
+	all->time_eat = ft_atoi(argv[3]) * 1000;
+	all->time_sleep = ft_atoi(argv[4]) * 1000;
 	if (argv[5])
 	{
 		all->num_iterations[0] = 1;
@@ -44,12 +44,15 @@ void	initializase_var(t_all *all)
 
 int	main(int argc, char **argv)
 {
-	t_all all;
-	
-	initializase_var(&all);
-	if (!check_arguments(argv, &all))
+	t_all *all;
+
+	all = malloc(sizeof (t_all));
+	if (!all)
+		return (str_error("error, malloc structure"));
+	initializase_var(all);
+	if (!check_arguments(argv, all))
 		return (-1);
-	if (!threads(&all))
+	if (!threads(all))
 		return (-1);
 	return (0);
 }
