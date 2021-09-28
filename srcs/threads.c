@@ -6,122 +6,103 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/21 18:32:27 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/23 15:45:01 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/28 19:02:05 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-uint64_t	time_in_ms()
-{
-	struct timeval	tv;
-	uint64_t		time;
-	
-	gettimeofday(&tv, NULL);
-	time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
-	return (time);
-}
-
 void	micro_sleep(int time_to_sleep)
 {
-	uint64_t		time;
+//	uint64_t		time;
+	__uint64_t		time;
 
 	time = time_in_ms();
-	while (time_in_ms() > (time + time_to_sleep))
+	while (time_in_ms() < (time + time_to_sleep))
 		usleep(100);
 }
 
-void	print_status(char *status, int index, suseconds_t time, t_all *all)
+void	print_status(char *status, int index, t_all *all)
 {
-	if (all->is_alive)
-		printf("%dms %d %s\n", time, index, status);
-}
-
-int	check_if_dead(int index, uint64_t time, t_all *all)
-{
-	if (time_in_ms() - all->start_time - time >= all->time_die)
-	{
-		print_status("died", index, time, all);
-		all->is_alive = 0;
-		return (1);
-	}
-	return (0);
-}
-
-suseconds_t	eat(int index, uint64_t actual_time, t_all *all)
-{
-	uint64_t	time;
+	__uint64_t		time;
 	
-	pthread_mutex_lock(&all->forks[0]);
-	pthread_mutex_lock(&all->forks[1]);
-	//time = actual_time;
-	time = time_in_ms() - all->start_time + actual_time;
+	time = time_in_ms() - all->start_time;
+	pthread_mutex_lock(&all->print);
+	if (all->is_alive)
+		printf("%ldms %d %s\n", time, index, status);
+	pthread_mutex_unlock(&all->print);
+}
 
-	print_status("has taken a fork", index, time, all);
-//printf("********** time: %llu\n", time);
-		if (check_if_dead(index, time, all))
-			return (0);
-		print_status("is eating", index, time, all);
-		all->philo[index].time_before_eat = time;
-	usleep(all->time_eat);
+void	eat(int index, int next, t_all *all)
+{
+	pthread_mutex_lock(&all->forks[index]);
+	print_status("has taken a fork", index, all);
+	pthread_mutex_lock(&all->forks[next]);
+	print_status("has taken a fork", index, all);
+	all->philo[index].last_time_eat = time_in_ms();
+	print_status("is eating", index, all);
+	micro_sleep(all->time_eat);
+//	all->philo[index].last_time_eat = time_in_ms();
 	pthread_mutex_unlock(&all->forks[0]);
 	pthread_mutex_unlock(&all->forks[1]);
-	time += time_in_ms() - all->start_time - time;
-	print_status("is sleeping", index, time, all);
-	//printf("*******time[%d]: %ld : %ld\n", index, tv.tv_sec, tv.tv_usec);
-	usleep(all->time_sleep);
-	time += time_in_ms() - all->start_time - time;
-	print_status("is thinking", index, time, all);	
-	return (time);
+	print_status("is sleeping", index, all);
+	micro_sleep(all->time_sleep);
+	print_status("is thinking", index, all);
 }
 
 void	*prueba(t_all *all)
 {
-	uint64_t	actual_time;
 	int			index;
-	int			i = 1;
+	int			next;
 
 	pthread_mutex_lock(&all->index_mutex);
 	index = all->index;
 	all->index++;
+	next = all->index;
+	if (all->index >= all->num_philos)
+		next = 0;
 	pthread_mutex_unlock(&all->index_mutex);
-
-	actual_time = time_in_ms() - all->start_time;
-//	printf("time[%d]: %llums\n", index, actual_time);
+	if (index % 2 != 0)
+		micro_sleep(all->time_eat);
 	while (all->philo[index].num_iterations > 0)
 	{
-		actual_time += eat(index, actual_time, all);
+		eat(index, next, all);
 		if (all->flag_iterations)
 			all->philo[index].num_iterations--;
-		i++;
 	}
-	//gettimeofday(&tv, NULL);
-	//printf("final time[%d]: %ld : %d\n", index, tv.tv_sec, tv.tv_usec);
 	return (0);
 }
 
 int	threads(t_all *all)
 {
-	struct timeval tv;
 	int				i;
+	pthread_t		main_thread;
 
 	pthread_mutex_init(&all->index_mutex, NULL);
+	pthread_mutex_init(&all->print, NULL);
 	i = -1;
+	all->start_time = time_in_ms();
 	while (++i < all->num_philos)
 	{
 		pthread_mutex_init(&all->forks[i], NULL);
 		all->philo[i].is_alive = 1;
+		all->philo[i].last_time_eat = all->start_time;
 	}
 	all->index = 0;
-	all->start_time = time_in_ms();
+	if (pthread_create(&main_thread, NULL, (void *)&main_routine, all) != 0)
+			return (str_error("Error making threads"));
 	i = -1;
 	while (++i < all->num_philos)
 		if (pthread_create(&all->threads[i], NULL, (void *)&prueba, all) != 0)
 			return (str_error("Error making threads"));
+	if (pthread_join(main_thread, NULL) != 0)
+			return (str_error("Error joining threads"));
 	i = -1;
 	while (++i < all->num_philos)
 		if (pthread_join(all->threads[i], NULL) != 0)
 			return (str_error("Error joining threads"));
+	pthread_mutex_destroy(&all->print);
+	pthread_mutex_destroy(&all->index_mutex);
 	i = -1;
 	while (++i < all->num_philos)
 		pthread_mutex_destroy(&all->forks[i]);

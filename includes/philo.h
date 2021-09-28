@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/20 11:58:30 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/23 15:45:12 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/28 20:18:31 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,8 @@
 typedef struct	s_philo
 {
 	int			num_iterations;
-	suseconds_t	time_before_eat;
+	suseconds_t	last_time_eat;
 	int			is_alive;
-	int			state[3];
-
 }				t_philo;
 
 typedef struct	s_all
@@ -31,21 +29,21 @@ typedef struct	s_all
 	pthread_mutex_t	index_mutex;
 	int				index;
 	int				is_alive;
+	pthread_mutex_t	print;
+	__uint64_t		start_time;
 	int				time_die;
 	int				time_eat;
 	int				time_sleep;
 	int				flag_iterations;
 	pthread_t		*threads;
 	pthread_mutex_t	*forks;
-	
-	uint64_t		start_time;
-	uint64_t		current_time;
-
 	t_philo			*philo;
-
 }				t_all;
 
-int		threads(t_all *all);
-int		str_error(char	*error);
-int		ft_atoi(const char *str);
-void	ft_putstr_fd(char *s, int fd);
+__uint64_t		time_in_ms();
+void			print_status(char *status, int index, t_all *all);
+void			*main_routine(t_all *all);
+int				threads(t_all *all);
+int				str_error(char	*error);
+int				ft_atoi(const char *str);
+void			ft_putstr_fd(char *s, int fd);

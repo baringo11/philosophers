@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/16 11:32:31 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/23 15:31:44 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/28 17:30:51 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@ int	check_arguments(char **argv, t_all *all)
 	int	i;
 
 	all->num_philos = ft_atoi(argv[1]);
-	all->time_die = ft_atoi(argv[2]) * 1000;
-	all->time_eat = ft_atoi(argv[3]) * 1000;
-	all->time_sleep = ft_atoi(argv[4]) * 1000;
+	all->time_die = ft_atoi(argv[2]);
+	all->time_eat = ft_atoi(argv[3]);
+	all->time_sleep = ft_atoi(argv[4]);
 	if (all->num_philos < 0 || all->time_die <= 0 || all->time_eat <= 0 || all->time_sleep <= 0)
 		return (0);
 	all->threads = malloc(sizeof(pthread_t) * all->num_philos);
