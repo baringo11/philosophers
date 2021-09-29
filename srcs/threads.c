@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/21 18:32:27 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/28 19:02:05 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/29 09:34:59 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,17 +43,18 @@ void	eat(int index, int next, t_all *all)
 	print_status("is eating", index, all);
 	micro_sleep(all->time_eat);
 //	all->philo[index].last_time_eat = time_in_ms();
-	pthread_mutex_unlock(&all->forks[0]);
-	pthread_mutex_unlock(&all->forks[1]);
+	pthread_mutex_unlock(&all->forks[index]);
+	pthread_mutex_unlock(&all->forks[next]);
 	print_status("is sleeping", index, all);
 	micro_sleep(all->time_sleep);
 	print_status("is thinking", index, all);
 }
 
-void	*prueba(t_all *all)
+void	*philo_threads(t_all *all)
 {
 	int			index;
 	int			next;
+	int			i;
 
 	pthread_mutex_lock(&all->index_mutex);
 	index = all->index;
@@ -64,11 +65,17 @@ void	*prueba(t_all *all)
 	pthread_mutex_unlock(&all->index_mutex);
 	if (index % 2 != 0)
 		micro_sleep(all->time_eat);
-	while (all->philo[index].num_iterations > 0)
+	i = 1;
+	while (all->is_alive)
 	{
 		eat(index, next, all);
-		if (all->flag_iterations)
-			all->philo[index].num_iterations--;
+		if (all->flag_iterations && i == all->flag_iterations)
+		{
+			pthread_mutex_lock(&all->iterate_mutex);
+			all->cont_iterations++;
+			pthread_mutex_unlock(&all->iterate_mutex);		
+		}
+		i++;
 	}
 	return (0);
 }
@@ -80,12 +87,12 @@ int	threads(t_all *all)
 
 	pthread_mutex_init(&all->index_mutex, NULL);
 	pthread_mutex_init(&all->print, NULL);
+	pthread_mutex_init(&all->iterate_mutex, NULL);
 	i = -1;
 	all->start_time = time_in_ms();
 	while (++i < all->num_philos)
 	{
 		pthread_mutex_init(&all->forks[i], NULL);
-		all->philo[i].is_alive = 1;
 		all->philo[i].last_time_eat = all->start_time;
 	}
 	all->index = 0;
@@ -93,7 +100,7 @@ int	threads(t_all *all)
 			return (str_error("Error making threads"));
 	i = -1;
 	while (++i < all->num_philos)
-		if (pthread_create(&all->threads[i], NULL, (void *)&prueba, all) != 0)
+		if (pthread_create(&all->threads[i], NULL, (void *)&philo_threads, all) != 0)
 			return (str_error("Error making threads"));
 	if (pthread_join(main_thread, NULL) != 0)
 			return (str_error("Error joining threads"));
@@ -103,6 +110,7 @@ int	threads(t_all *all)
 			return (str_error("Error joining threads"));
 	pthread_mutex_destroy(&all->print);
 	pthread_mutex_destroy(&all->index_mutex);
+	pthread_mutex_destroy(&all->iterate_mutex);
 	i = -1;
 	while (++i < all->num_philos)
 		pthread_mutex_destroy(&all->forks[i]);

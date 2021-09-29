@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/16 11:32:31 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/28 17:30:51 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/29 09:14:13 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,16 +29,7 @@ int	check_arguments(char **argv, t_all *all)
 		return (0);
 	i = -1;
 	if (argv[5])
-	{
-		all->flag_iterations = 1;
-		while (++i < all->num_philos)
-			all->philo[i].num_iterations = ft_atoi(argv[5]);
-	}
-	else
-	{
-		while (++i < all->num_philos)
-			all->philo[i].num_iterations = 1;
-	}
+		all->flag_iterations = ft_atoi(argv[5]);
 	return (1);
 }
 
@@ -46,6 +37,7 @@ void	initializase_var(t_all *all)
 {
 	all->num_philos = 0;
 	all->flag_iterations = 0;
+	all->cont_iterations = 0;
 	all->is_alive = 1;
 }
 
