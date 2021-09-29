@@ -6,11 +6,18 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/16 11:32:31 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/29 09:14:13 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/29 11:40:26 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
+
+// valgrind --leak-check=full \
+// 			--show-leak-kinds=all \
+// 			--track-origins=yes \
+// 			--verbose \
+// 			--log-file=valgrind-out.txt \
+// 			./philo
 
 int	check_arguments(char **argv, t_all *all)
 {
@@ -24,8 +31,8 @@ int	check_arguments(char **argv, t_all *all)
 		return (0);
 	all->threads = malloc(sizeof(pthread_t) * all->num_philos);
 	all->forks = malloc(sizeof(pthread_mutex_t) * all->num_philos);
-	all->philo = (t_philo *)malloc(sizeof(t_philo) * all->num_philos);
-	if (!all->threads || !all->forks || !all->philo)
+	all->last_time_eat = malloc(sizeof(uint64_t) * all->num_philos);
+	if (!all->threads || !all->forks || !all->last_time_eat)
 		return (0);
 	i = -1;
 	if (argv[5])
@@ -41,10 +48,15 @@ void	initializase_var(t_all *all)
 	all->is_alive = 1;
 }
 
+void	ret()
+{
+	system("leaks philo");
+}
+
 int	main(int argc, char **argv)
 {
 	t_all *all;
-
+argc = 1;
 	all = malloc(sizeof (t_all));
 	if (!all)
 		return (str_error("error, malloc structure"));
@@ -53,5 +65,15 @@ int	main(int argc, char **argv)
 		return (-1);
 	if (!threads(all))
 		return (-1);
+	clean(all);
+//	ret();
 	return (0);
+}
+
+void	clean(t_all *all)
+{
+	free(all->last_time_eat);
+	free(all->threads);
+	free(all->forks);
+	free(all);
 }

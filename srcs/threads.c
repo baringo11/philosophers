@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/21 18:32:27 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/29 09:34:59 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/29 11:40:10 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 
 void	micro_sleep(int time_to_sleep)
 {
-//	uint64_t		time;
-	__uint64_t		time;
+	uint64_t		time;
 
 	time = time_in_ms();
 	while (time_in_ms() < (time + time_to_sleep))
@@ -29,7 +28,7 @@ void	print_status(char *status, int index, t_all *all)
 	time = time_in_ms() - all->start_time;
 	pthread_mutex_lock(&all->print);
 	if (all->is_alive)
-		printf("%ldms %d %s\n", time, index, status);
+		printf("%lldms %d %s\n", time, ++index, status);
 	pthread_mutex_unlock(&all->print);
 }
 
@@ -37,9 +36,11 @@ void	eat(int index, int next, t_all *all)
 {
 	pthread_mutex_lock(&all->forks[index]);
 	print_status("has taken a fork", index, all);
+	if (all->num_philos == 1)
+		return (micro_sleep(all->time_die * 2));
 	pthread_mutex_lock(&all->forks[next]);
 	print_status("has taken a fork", index, all);
-	all->philo[index].last_time_eat = time_in_ms();
+	all->last_time_eat[index] = time_in_ms();
 	print_status("is eating", index, all);
 	micro_sleep(all->time_eat);
 //	all->philo[index].last_time_eat = time_in_ms();
@@ -93,7 +94,7 @@ int	threads(t_all *all)
 	while (++i < all->num_philos)
 	{
 		pthread_mutex_init(&all->forks[i], NULL);
-		all->philo[i].last_time_eat = all->start_time;
+		all->last_time_eat[i] = all->start_time;
 	}
 	all->index = 0;
 	if (pthread_create(&main_thread, NULL, (void *)&main_routine, all) != 0)
@@ -114,6 +115,5 @@ int	threads(t_all *all)
 	i = -1;
 	while (++i < all->num_philos)
 		pthread_mutex_destroy(&all->forks[i]);
-
 	return (1);
 }
