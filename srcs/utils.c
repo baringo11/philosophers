@@ -6,18 +6,17 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/16 12:46:26 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/29 11:34:16 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/29 19:28:21 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-
-uint64_t	time_in_ms()
+__uint64_t	time_in_ms(void)
 {
 	struct timeval	tv;
-	uint64_t		time;
-	
+	__uint64_t		time;
+
 	gettimeofday(&tv, NULL);
 	time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 	return (time);
@@ -26,7 +25,7 @@ uint64_t	time_in_ms()
 int	str_error(char	*error)
 {
 	ft_putstr_fd(error, 2);
-	return (-1);
+	return (0);
 }
 
 int	ft_atoi(const char *str)
