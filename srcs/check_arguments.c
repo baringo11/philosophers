@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/29 18:59:38 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/29 20:14:25 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/30 11:34:29 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,10 @@ int	correct_argument(char **argv)
 
 int	check_arguments(int argc, char **argv, t_all *all)
 {
-	int	i;
-
 	if (argc != 5 && argc != 6)
 		return (str_error("error, wrong number of arguments"));
 	if (!correct_argument(argv))
-		return (str_error("error, only number arguments"));
+		return (str_error("error, only positive number arguments"));
 	all->num_philos = ft_atoi(argv[1]);
 	all->time_die = ft_atoi(argv[2]);
 	all->time_eat = ft_atoi(argv[3]);
@@ -54,11 +52,14 @@ int	check_arguments(int argc, char **argv, t_all *all)
 		return (str_error("error, wrong number"));
 	all->threads = malloc(sizeof(pthread_t) * all->num_philos);
 	all->forks = malloc(sizeof(pthread_mutex_t) * all->num_philos);
-	all->last_time_eat = malloc(sizeof(__uint64_t) * all->num_philos);
+	all->last_time_eat = malloc(sizeof(uint64_t) * all->num_philos);
 	if (!all->threads || !all->forks || !all->last_time_eat)
 		return (str_error("error, malloc structure"));
-	i = -1;
 	if (argv[5])
+	{
 		all->flag_iterations = ft_atoi(argv[5]);
+		if (all->flag_iterations == 0 || all->flag_iterations == -1)
+			return (str_error("error, wrong number"));
+	}
 	return (1);
 }

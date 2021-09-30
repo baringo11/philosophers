@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/20 11:58:30 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/29 19:55:59 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/30 11:01:59 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,21 +26,21 @@ typedef struct s_all
 	int				index;
 	int				is_alive;
 	pthread_mutex_t	print;
-	__uint64_t		start_time;
+	uint64_t		start_time;
 	int				time_die;
 	int				time_eat;
 	int				time_sleep;
 	int				flag_iterations;
 	int				cont_iterations;
 	pthread_mutex_t	iterate_mutex;
-	__uint64_t		*last_time_eat;
+	uint64_t		*last_time_eat;
 	pthread_t		*threads;
 	pthread_mutex_t	*forks;
 }					t_all;
 
 int				check_arguments(int argc, char **argv, t_all *all);
 void			clean(t_all *all);
-__uint64_t		time_in_ms(void);
+uint64_t		time_in_ms(void);
 void			print_status(char *status, int index, t_all *all);
 void			*main_routine(t_all *all);
 int				threads(t_all *all);

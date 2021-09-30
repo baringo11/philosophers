@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/24 13:22:11 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/29 20:12:07 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/30 11:19:55 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,13 @@
 
 void	*main_routine(t_all *all)
 {
-	int			i;
+	int	i;
 
 	i = 0;
 	while (1)
 	{
 		if (i == all->num_philos)
 			i = 0;
-			printf("%ld > %ld\n", time_in_ms(), all->last_time_eat[i] + all->time_die);
 		if (time_in_ms() > all->last_time_eat[i] + all->time_die || \
 			all->cont_iterations == all->num_philos)
 		{
@@ -29,7 +28,7 @@ void	*main_routine(t_all *all)
 			if (all->cont_iterations == all->num_philos)
 				printf("**FINISH**\n");
 			else
-				printf("%ldms %d died\n", time_in_ms() - all->start_time, ++i);
+				printf("%lld %d died\n", time_in_ms() - all->start_time, ++i);
 			all->is_alive = 0;
 			pthread_mutex_unlock(&all->print);
 			break ;

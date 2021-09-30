@@ -6,13 +6,13 @@
 #    By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/16 11:55:49 by jbaringo          #+#    #+#              #
-#    Updated: 2021/09/29 20:03:05 by jbaringo         ###   ########.fr        #
+#    Updated: 2021/09/30 11:08:56 by jbaringo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME =	philo
 CC =	gcc
-FLAGS = -c -g -pthread #-Wall -Wextra -Werror
+FLAGS = -c -pthread -Wall -Wextra -Werror
 OBJS =	$(SRCS:.c=.o)
 SRCS =	srcs/main.c srcs/utils.c srcs/threads.c srcs/main_thread.c srcs/check_arguments.c
 
@@ -20,7 +20,7 @@ philo: $(SRCS)
 	$(CC) $(FLAGS) $(SRCS)
 	mkdir -p srcs/obj
 	mv *.o srcs/obj
-	gcc -pthread -o $(NAME) srcs/obj/*.o #-g3 -fsanitize=address
+	gcc -pthread -o $(NAME) srcs/obj/*.o
 
 all: $(NAME)
 

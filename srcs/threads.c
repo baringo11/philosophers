@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/21 18:32:27 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/29 19:35:07 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/30 11:48:17 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	micro_sleep(int time_to_sleep)
 {
-	__uint64_t		time;
+	uint64_t		time;
 
 	time = time_in_ms();
 	while (time_in_ms() < (time + time_to_sleep))
@@ -23,12 +23,12 @@ void	micro_sleep(int time_to_sleep)
 
 void	print_status(char *status, int index, t_all *all)
 {
-	__uint64_t		time;
+	uint64_t		time;
 
 	time = time_in_ms() - all->start_time;
 	pthread_mutex_lock(&all->print);
 	if (all->is_alive)
-		printf("%ldms %d %s\n", time, ++index, status);
+		printf("%lld %d %s\n", time, ++index, status);
 	pthread_mutex_unlock(&all->print);
 }
 
@@ -74,7 +74,11 @@ void	*philos(t_all *all)
 	i = 1;
 	while (all->is_alive)
 	{
-		eat(index, next, i, all);
+		if (!all->flag_iterations || \
+			(all->flag_iterations && i <= all->flag_iterations))
+			eat(index, next, i, all);
+		else
+			all->last_time_eat[index] = time_in_ms();
 		i++;
 	}
 	return (0);
@@ -86,6 +90,7 @@ int	threads(t_all *all)
 	pthread_t		main_thread;
 
 	all->start_time = time_in_ms();
+	i = -1;
 	while (++i < all->num_philos)
 	{
 		pthread_mutex_init(&all->forks[i], NULL);
