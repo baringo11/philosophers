@@ -6,7 +6,7 @@
 /*   By: jbaringo <jbaringo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/21 18:32:27 by jbaringo          #+#    #+#             */
-/*   Updated: 2021/09/30 11:48:17 by jbaringo         ###   ########.fr       */
+/*   Updated: 2021/09/30 12:26:08 by jbaringo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,18 +42,18 @@ void	eat(int index, int next, int i, t_all *all)
 	print_status("has taken a fork", index, all);
 	all->last_time_eat[index] = time_in_ms();
 	print_status("is eating", index, all);
-	micro_sleep(all->time_eat);
-	pthread_mutex_unlock(&all->forks[index]);
-	pthread_mutex_unlock(&all->forks[next]);
-	print_status("is sleeping", index, all);
-	micro_sleep(all->time_sleep);
-	print_status("is thinking", index, all);
 	if (all->flag_iterations && i == all->flag_iterations)
 	{
 		pthread_mutex_lock(&all->iterate_mutex);
 		all->cont_iterations++;
 		pthread_mutex_unlock(&all->iterate_mutex);
 	}
+	micro_sleep(all->time_eat);
+	pthread_mutex_unlock(&all->forks[index]);
+	pthread_mutex_unlock(&all->forks[next]);
+	print_status("is sleeping", index, all);
+	micro_sleep(all->time_sleep);
+	print_status("is thinking", index, all);
 }
 
 void	*philos(t_all *all)
@@ -74,11 +74,7 @@ void	*philos(t_all *all)
 	i = 1;
 	while (all->is_alive)
 	{
-		if (!all->flag_iterations || \
-			(all->flag_iterations && i <= all->flag_iterations))
-			eat(index, next, i, all);
-		else
-			all->last_time_eat[index] = time_in_ms();
+		eat(index, next, i, all);
 		i++;
 	}
 	return (0);
